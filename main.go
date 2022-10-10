@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,7 @@ var albums = []album{
 	{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
 	{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
 	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
+	{ID: "4", Title: "A Love Supremacy", Artist: "John Coltrane", Price: 39.99},
 }
 
 func main() {
@@ -25,6 +27,7 @@ func main() {
 	router.GET("/albums/:id", getAlbumById)
 	router.GET("/albums/getMostExpensiveAlbum", getMostExpensiveAlbum)
 	router.GET("/albums/getCheapestAlbum", getCheapestAlbum)
+	router.GET("/albums/getArtistWithMostAlbums", artistWithMostAlbums)
 	router.POST("/albums", postAlbums)
 
 	router.Run("localhost:8080")
@@ -47,6 +50,7 @@ func postAlbums(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, albums)
 }
 
+// gets the specific album that has the passed in ID.
 func getAlbumById(c *gin.Context) {
 	id := c.Param("id")
 
@@ -60,6 +64,7 @@ func getAlbumById(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
 
+// gets the name and price of the most expensive album in the database
 func getMostExpensiveAlbum(c *gin.Context) {
 	max := albums[0].Price
 	maxAlbum := albums[0]
@@ -71,9 +76,12 @@ func getMostExpensiveAlbum(c *gin.Context) {
 		}
 	}
 
-	c.IndentedJSON(http.StatusOK, maxAlbum)
+	result := fmt.Sprintf("%v, Price: %f", maxAlbum, max)
+
+	c.IndentedJSON(http.StatusOK, result)
 }
 
+// gets the name and price of the cheapest album in the database
 func getCheapestAlbum(c *gin.Context) {
 	min := albums[0].Price
 	minAlbum := albums[0]
@@ -85,5 +93,25 @@ func getCheapestAlbum(c *gin.Context) {
 		}
 	}
 
-	c.IndentedJSON(http.StatusOK, minAlbum)
+	result := fmt.Sprintf("%v, Price: %f", minAlbum, min)
+
+	c.IndentedJSON(http.StatusOK, result)
+}
+
+// returns the artist that has the most albums in the database.
+func artistWithMostAlbums(c *gin.Context) {
+	artistAndAlbums := make(map[string]int)
+	max := 0
+	maxArtist := ""
+	for _, a := range albums {
+		if artistAndAlbums[a.Artist] == 0 {
+			artistAndAlbums[a.Artist]++
+			if artistAndAlbums[a.Artist] > max {
+				max = artistAndAlbums[a.Artist]
+				maxArtist = a.Artist
+			}
+		}
+	}
+
+	c.IndentedJSON(http.StatusOK, maxArtist)
 }
