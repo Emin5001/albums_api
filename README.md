@@ -9,6 +9,7 @@ The goal of this project is to gain more experience in Go programming, and incre
 # How to run
 1. Clone this repository to your personal computer.
 2. Run `go run .` on your terminal inside of this repository to start the server.
-3. Make your API calls! An example of an API call to get the cheapest album would be `curl http://localhost:8080/albums/getCheapestAlbum`.
+3. Make your API calls! An example of an API call to get the cheapest album would be 
+`curl http://localhost:8080/albums/getCheapestAlbum`.
 
 Have fun!
